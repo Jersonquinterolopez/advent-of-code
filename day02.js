@@ -53,7 +53,42 @@ function partOne() {
   console.log(result)
 }
 
-function partTwo() {}
+const solution = {
+  A: {
+    // rock
+    X: moves.scissors, // lose
+    Y: moves.rock, // draw
+    Z: moves.paper, // win
+  },
+  B: {
+    // paper
+    X: moves.rock,
+    Y: moves.paper,
+    Z: moves.scissors,
+  },
+  C: {
+    // scissors
+    X: moves.paper,
+    Y: moves.scissors,
+    Z: moves.rock,
+  },
+}
+
+function partTwo() {
+  const outcomes = lines.map((line) => {
+    const opponentMove = mapInput[line[0]] // "scissors"
+
+    // Guess our move from the instructions
+    // line[0][line[1]] = A: { Y } draw
+    const ourMove = solution[line[0]][line[1]] // "rock"
+
+    return score(opponentMove, ourMove) // (rock, scissors)
+  })
+
+  const result = outcomes.reduce((a, b) => a + b, 0)
+  console.log(result)
+  return result
+}
 
 partOne()
 partTwo()
