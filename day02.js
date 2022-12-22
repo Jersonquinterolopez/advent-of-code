@@ -1,74 +1,59 @@
 import { readFileSync } from 'node:fs'
 
-const RawMatches = readFileSync('day02.txt', { encoding: 'utf-8' })
+const lines = readFileSync('day02.txt', { encoding: 'utf-8' })
   .replace(/\r/g, '')
   .trim()
   .split('\n')
+  .map((line) => line.split(' ')) // split each match in an array
 
-const scores = [
-  { keyword: 'A', identifier: 'rock', score: 1 },
-  { keyword: 'B', identifier: 'paper', score: 2 },
-  { keyword: 'C', identifier: 'scissors', score: 3 },
-  { keyword: 'X', identifier: 'rock', score: 1 },
-  { keyword: 'Y', identifier: 'paper', score: 2 },
-  { keyword: 'Z', identifier: 'scissors', score: 3 },
-]
+const moves = {
+  rock: 1,
+  paper: 2,
+  scissors: 3,
+}
 
-const findValue = (keyword) =>
-  scores.find((element) => element.keyword === keyword)
+const mapInput = {
+  A: moves.rock,
+  B: moves.paper,
+  C: moves.scissors,
+  X: moves.rock,
+  Y: moves.paper,
+  Z: moves.scissors,
+}
 
-const matches = RawMatches.map((keyword, index) => ({
-  leftPlayer: { id: index, ...findValue(keyword.charAt(0)) },
-  rightPlayer: {
-    id: index,
-    ...findValue(keyword.charAt(2)),
-  },
-}))
-
-const WINNER_SCORE = 6
-const LOSSER_SCORE = 0
-const DRAW_SCORE = 3
-
-function playMatch(match) {
-  let leftPlayer = Object.values(match)[0]
-  let rightPlayer = Object.values(match)[1]
-
+function score(opponentMove, ourMove) {
   // Draw
-  if (leftPlayer.identifier === rightPlayer.identifier)
-    return rightPlayer.score + DRAW_SCORE
-
-  // left player cases
-  if (leftPlayer.identifier === 'rock') {
-    if (rightPlayer.identifier === 'paper')
-      return rightPlayer.score + WINNER_SCORE
-    if (rightPlayer.identifier === 'scissors')
-      return rightPlayer.score + LOSSER_SCORE
+  if (opponentMove === ourMove) {
+    return ourMove + 3
   }
 
-  if (leftPlayer.identifier === 'paper') {
-    if (rightPlayer.identifier === 'rock')
-      return rightPlayer.score + LOSSER_SCORE
-    if (rightPlayer.identifier === 'scissors')
-      return rightPlayer.score + WINNER_SCORE
+  // we win
+  if (
+    (opponentMove === moves.rock && ourMove === moves.paper) ||
+    (opponentMove === moves.paper && ourMove === moves.scissors) ||
+    (opponentMove === moves.scissors && ourMove === moves.rock)
+  ) {
+    return ourMove + 6
   }
 
-  if (leftPlayer.identifier === 'scissors') {
-    if (rightPlayer.identifier === 'rock')
-      return rightPlayer.score + WINNER_SCORE
-    if (rightPlayer.identifier === 'paper')
-      return rightPlayer.score + LOSSER_SCORE
-  }
+  // if not of this is true the only thing we have left is that we lost
+  // we lost
+  return ourMove
 }
 
-function getFinalScore(matches) {
-  let finalScore = 0
-  for (const match of matches) {
-    let score = playMatch(match)
-    finalScore += score
-  }
-  console.log(finalScore)
+function partOne() {
+  const outcomes = lines.map((line) => {
+    const opponentMove = mapInput[line[0]]
+    const ourMove = mapInput[line[1]]
+
+    return score(opponentMove, ourMove)
+  })
+
+  const result = outcomes.reduce((a, b) => a + b, 0)
+  console.log(result)
 }
 
-getFinalScore(matches)
+function partTwo() {}
 
-// result 9759
+partOne()
+partTwo()
